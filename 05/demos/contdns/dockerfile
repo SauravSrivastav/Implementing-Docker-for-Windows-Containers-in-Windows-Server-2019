@@ -1,0 +1,22 @@
+# escape=`
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
+
+RUN powershell -Command " `
+ Install-WindowsFeature DNS,RSAT-DNS-Server -Verbose `
+"
+
+ENTRYPOINT powershell -Command " `
+ Add-DnsServerPrimaryZone -Name company.pri -ZoneFile company.pri.dns -Verbose ; `
+ $localip = Get-NetIPAddress -AddressFamily ipv4 -InterfaceAlias 'vEthernet (Ethernet)*' ; `
+ Add-DnsServerResourceRecord -ZoneName company.pri -A -Name (Get-Content env:computername) -IPv4Address $Localip.ipaddress -Verbose ; `
+ ping -t localhost > NULL `
+"
+
+HEALTHCHECK --interval=2s `
+ CMD powershell -Command `
+  try { `
+   $result = Get-Service dns ; `
+   if ($result.status -eq 'Running') { exit 0 } `
+   else { exit 1 } ; `
+  } catch { exit 1 }

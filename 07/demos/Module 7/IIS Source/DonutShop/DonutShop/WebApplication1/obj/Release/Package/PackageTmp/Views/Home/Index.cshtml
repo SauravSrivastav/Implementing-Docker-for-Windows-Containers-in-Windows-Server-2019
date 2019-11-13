@@ -1,0 +1,29 @@
+﻿@model WebApplication1.Models.Customers
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Donuts!</h1>
+    <p class="lead">How many donuts does each person have?</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Let's count donuts:</h2>
+        <table>
+            <tr>
+                <th>Which Person?</th>
+                <th>How Many Donuts?</th>
+            </tr>
+            @foreach(var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.Name</td>
+                    <td>@order.DonutCount</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
